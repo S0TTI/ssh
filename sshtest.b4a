@@ -1,0 +1,90 @@
+﻿Version=6.3
+NumberOfModules=1
+Module1=Starter
+Build1=Default,Akbari.Shoaib.ssh
+ManifestCode='This code will be applied to the manifest file during compilation.~\n~'You do not need to modify it in most cases.~\n~'See this link for for more information: http://www.b4x.com/forum/showthread.php?p=78136~\n~AddManifestText(~\n~<uses-sdk android:minSdkVersion="5" android:targetSdkVersion="19"/>~\n~<supports-screens android:largeScreens="true" ~\n~    android:normalScreens="true" ~\n~    android:smallScreens="true" ~\n~    android:anyDensity="true"/>)~\n~SetApplicationAttribute(android:icon, "@drawable/icon")~\n~SetApplicationAttribute(android:label, "$LABEL$")~\n~'End of default text.~\n~AddPermission(android.permission.INTERNET)
+IconFile=
+NumberOfFiles=1
+File1=1.bal
+NumberOfLibraries=3
+Library1=core
+Library2=jkssh2
+Library3=phone
+@EndOfDesignText@
+#Region  Project Attributes 
+	#ApplicationLabel: ssh
+	#VersionCode: 1
+	#VersionName: 
+	'SupportedOrientations possible values: unspecified, landscape or portrait.
+	#SupportedOrientations: portrait
+	#CanInstallToExternalStorage: False
+#End Region
+
+#Region  Activity Attributes 
+	#FullScreen: False
+	#IncludeTitle: True
+#End Region
+
+Sub Process_Globals
+End Sub
+
+Sub Globals
+	Dim ssh As jkSSH2
+	Private btnrun As Button
+	Private edittxt As EditText
+	Private ScrollView1 As ScrollView
+	Private btnok As Button
+	Private Panel1 As Panel
+End Sub
+
+Sub Activity_Create(FirstTime As Boolean)
+	Activity.LoadLayout("1")
+
+	ssh.Initialize("connect","192.168.1.200",22)
+	ssh.authenticateWithNone("admin")	
+	Log(ssh.IsConnected()&"    ==== ******************************************2")
+	
+	ScrollView1.Visible = False
+	edittxt.Initialize("edittxt")
+	ScrollView1.Panel.AddView(edittxt,2dip,2dip,ScrollView1.Width-2dip,ScrollView1.Height-15dip)
+	edittxt.TextColor = Colors.Green
+	edittxt.TextSize = 20
+	edittxt.Gravity = Gravity.TOP
+	edittxt.Invalidate 
+End Sub
+
+Sub Activity_Resume
+End Sub
+
+Sub Activity_Pause (UserClosed As Boolean)
+End Sub
+
+Sub connect_CmdExecuted (Success As Boolean, Result As List, TaskId As Int)
+	Log(TaskId&"   i am here1")
+	If Success Then
+      For i=0 To Result.Size-1
+		 Log(Result.Get(i) & CRLF)	
+		 edittxt.Text = edittxt.Text & Result.Get(i) & CRLF
+		 ScrollView1.Panel.Height = edittxt.Height + 5dip
+		 edittxt.Height = ScrollView1.Panel.Height
+      Next
+   End If
+   Log (TaskId&"    ====********************************************* 33")
+   ssh.close
+End Sub
+
+Sub btnrun_Click
+	
+	ssh.execCommand("ping count=2 192.168.1.1", 10)
+	
+	btnok.Visible = True
+	ScrollView1.Visible = btnok.Visible
+	Panel1.Visible = ScrollView1.Visible
+End Sub
+
+Sub btnok_Click
+	edittxt.Text = ""
+	btnok.Visible = False
+	ScrollView1.Visible = btnok.Visible
+	Panel1.Visible = ScrollView1.Visible
+End Sub
